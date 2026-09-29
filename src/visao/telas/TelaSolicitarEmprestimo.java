@@ -18,12 +18,12 @@ public class TelaSolicitarEmprestimo extends JFrame {
         JPanel painel = new JPanel(new GridLayout(2, 2, 10, 10));
         painel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        List<Livro> livros = EmprestimoControle.listarLivrosDisponiveis();
+        List<Livro> livros = EmprestimoControle.listarLivrosParaEmprestimo(idUsuario);
 
         JLabel lblLivro = new JLabel("Livro:");
         JComboBox<String> comboLivro = new JComboBox<>(
                 livros.stream()
-                        .map(l -> l.getIdLivro() + " - " + l.getTitulo())
+                        .map(l -> l.getIdLivro() + " - " + l.getTitulo() + " (" + l.getStatus() + ")")
                         .toArray(String[]::new)
         );
 

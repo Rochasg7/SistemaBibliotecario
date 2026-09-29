@@ -1,10 +1,13 @@
 package util;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import modelo.*;
 
 public class ManipuladorArquivos {
@@ -60,9 +63,17 @@ public class ManipuladorArquivos {
         reescreverArquivo("Usuario.csv", linhas);
     }
 
+    private static BufferedReader abrirLeitor(File arq) throws IOException {
+        return new BufferedReader(new InputStreamReader(new FileInputStream(arq), StandardCharsets.UTF_8));
+    }
+
+    private static Writer abrirEscritor(File arq, boolean anexar) throws IOException {
+        return new OutputStreamWriter(new FileOutputStream(arq, anexar), StandardCharsets.UTF_8);
+    }
+
     private static void reescreverArquivo(String arquivo, List<String> linhas) {
         try {
-            FileWriter fw = new FileWriter(new File(DIRETORIO, arquivo), false);
+            Writer fw = abrirEscritor(new File(DIRETORIO, arquivo), false);
             for (String linha : linhas) {
                 fw.write(linha + "\n");
             }
@@ -88,6 +99,25 @@ public class ManipuladorArquivos {
         reescreverArquivo("Usuario.csv", linhas);
     }
 
+    public static void removerBibliotecaria(int idBibliotecaria) {
+        List<Bibliotecaria> bibliotecarias = lerBibliotecarias();
+        bibliotecarias.removeIf(b -> b.getIdBibliotecaria() == idBibliotecaria);
+
+        List<String> linhas = new ArrayList<>();
+        for (Bibliotecaria b : bibliotecarias) {
+            linhas.add(b.toCSV());
+        }
+        reescreverArquivo("Bibliotecaria.csv", linhas);
+    }
+
+    public static void reescreverArquivoBibliotecarias(List<Bibliotecaria> bibliotecarias) {
+        List<String> linhas = new ArrayList<>();
+        for (Bibliotecaria b : bibliotecarias) {
+            linhas.add(b.toCSV());
+        }
+        reescreverArquivo("Bibliotecaria.csv", linhas);
+    } 
+
     public static List<Bibliotecaria> lerBibliotecarias() {
         List<Bibliotecaria> bibliotecarias = new ArrayList<>();
         try {
@@ -95,7 +125,7 @@ public class ManipuladorArquivos {
             if (!arq.exists())
                 return bibliotecarias;
 
-            BufferedReader br = new BufferedReader(new FileReader(arq));
+            BufferedReader br = abrirLeitor(arq);
             String linha;
 
             while ((linha = br.readLine()) != null) {
@@ -119,8 +149,7 @@ public class ManipuladorArquivos {
 
     private static void salvarLinha(String arquivo, String linha) {
         try {
-            FileWriter fw = new FileWriter(
-                    new File(DIRETORIO, arquivo), true);
+            Writer fw = abrirEscritor(new File(DIRETORIO, arquivo), true);
 
             fw.write(linha + "\n");
             fw.close();
@@ -137,7 +166,7 @@ public class ManipuladorArquivos {
             if (!arq.exists())
                 return livros;
 
-            BufferedReader br = new BufferedReader(new FileReader(arq));
+            BufferedReader br = abrirLeitor(arq);
             String linha;
 
             while ((linha = br.readLine()) != null) {
@@ -171,7 +200,7 @@ public class ManipuladorArquivos {
             if (!arq.exists())
                 return usuarios;
 
-            BufferedReader br = new BufferedReader(new FileReader(arq));
+            BufferedReader br = abrirLeitor(arq);
             String linha;
 
             while ((linha = br.readLine()) != null) {
@@ -206,7 +235,7 @@ public class ManipuladorArquivos {
             List<Usuario> usuarios = lerUsuarios();
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-            BufferedReader br = new BufferedReader(new FileReader(arq));
+            BufferedReader br = abrirLeitor(arq);
             String linha;
 
             while ((linha = br.readLine()) != null) {
@@ -220,6 +249,11 @@ public class ManipuladorArquivos {
 
                     Livro livro = buscarLivroPorId(livros, idLivro);
                     Usuario usuario = buscarUsuarioPorId(usuarios, idUsuario);
+
+                    if (livro == null || usuario == null) {
+                        System.out.println("Empréstimo órfão ignorado (livro ou usuário inexistente): " + linha);
+                        continue;
+                    }
 
                     Emprestimo emprestimo = new Emprestimo(id, livro, usuario, dataEmprestimo);
 
@@ -239,7 +273,12 @@ public class ManipuladorArquivos {
         } catch (Exception e) {
             System.out.println("Erro ao ler empréstimos: " + e.getMessage());
         }
-        return emprestimos;
+
+        Map<Integer, Emprestimo> ultimoPorId = new LinkedHashMap<>();
+        for (Emprestimo emprestimo : emprestimos) {
+            ultimoPorId.put(emprestimo.getIdEmprestimo(), emprestimo);
+        }
+        return new ArrayList<>(ultimoPorId.values());
     }
 
     public static List<Reserva> lerReservas() {
@@ -253,7 +292,7 @@ public class ManipuladorArquivos {
             List<Usuario> usuarios = lerUsuarios();
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-            BufferedReader br = new BufferedReader(new FileReader(arq));
+            BufferedReader br = abrirLeitor(arq);
             String linha;
 
             while ((linha = br.readLine()) != null) {
@@ -268,6 +307,11 @@ public class ManipuladorArquivos {
 
                     Livro livro = buscarLivroPorId(livros, idLivro);
                     Usuario usuario = buscarUsuarioPorId(usuarios, idUsuario);
+
+                    if (livro == null || usuario == null) {
+                        System.out.println("Reserva órfã ignorada (livro ou usuário inexistente): " + linha);
+                        continue;
+                    }
 
                     Reserva reserva = new Reserva(id, livro, usuario, dataReserva);
                     reserva.setStatusReserva(status);
@@ -314,7 +358,7 @@ public class ManipuladorArquivos {
                 return 1;
             }
 
-            BufferedReader br = new BufferedReader(new FileReader(arq));
+            BufferedReader br = abrirLeitor(arq);
 
             String linha;
 
@@ -337,4 +381,43 @@ public class ManipuladorArquivos {
 
         return maiorId + 1;
     }
+
+    public static void removerReserva(int idReserva) {
+        List<Reserva> reservas = lerReservas();
+            reservas.removeIf(r -> r.getIdReserva() == idReserva);
+
+        List<String> linhas = new ArrayList<>();
+        for (Reserva r : reservas) {
+            linhas.add(r.toCSV());
+        }
+    reescreverArquivo("Reserva.csv", linhas);
+    }
+
+    public static void reescreverArquivoReservas(List<Reserva> reservas) {
+        List<String> linhas = new ArrayList<>();
+        for (Reserva r : reservas) {
+            linhas.add(r.toCSV());
+        }
+        reescreverArquivo("Reserva.csv", linhas);
+    }
+
+    public static void removerEmprestimo(int idEmprestimo) {
+        List<Emprestimo> emprestimos = lerEmprestimos();
+        emprestimos.removeIf(e -> e.getIdEmprestimo() == idEmprestimo);
+
+        List<String> linhas = new ArrayList<>();
+        for (Emprestimo e : emprestimos) {
+            linhas.add(e.toCSV());
+        }
+        reescreverArquivo("Emprestimo.csv", linhas);
+    }
+
+    public static void reescreverArquivoEmprestimos(List<Emprestimo> emprestimos) {
+        List<String> linhas = new ArrayList<>();
+        for (Emprestimo e : emprestimos) {
+            linhas.add(e.toCSV());
+        }
+        reescreverArquivo("Emprestimo.csv", linhas);
+}
+
 }

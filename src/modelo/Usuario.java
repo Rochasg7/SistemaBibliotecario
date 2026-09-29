@@ -40,6 +40,10 @@ public class Usuario {
         System.out.println("Empréstimo solicitado por " + nome);
     }
 
+    public void consultarEmprestimos() {
+        System.out.println("Consulta de empréstimos solicitada por " + nome);
+    }
+
     public void solicitarReserva() {
         System.out.println("Reserva solicitada por " + nome);
     }

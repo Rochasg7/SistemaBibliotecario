@@ -25,7 +25,7 @@ public class TelaMinhasReservas extends JFrame {
             modeloLista.addElement("Nenhuma reserva encontrada.");
         } else {
             for (Reserva r : reservas) {
-                modeloLista.addElement(r.getLivro().getTitulo() + " - Reservado em "
+                modeloLista.addElement(r.getLivro().getTitulo() + " - Reservado para "
                         + sdf.format(r.getDataReserva()) + " (" + r.getStatusReserva() + ")");
             }
         }

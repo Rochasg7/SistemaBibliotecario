@@ -20,13 +20,13 @@ public class TelaRegistrarEmprestimo extends JFrame {
         JPanel painel = new JPanel(new GridLayout(3, 2, 10, 10));
         painel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        List<Livro> livros = EmprestimoControle.listarLivrosDisponiveis();
+        List<Livro> livros = EmprestimoControle.listarLivrosParaEmprestimo(null);
         List<Usuario> usuarios = ManipuladorArquivos.lerUsuarios();
 
         JLabel lblLivro = new JLabel("Livro:");
         JComboBox<String> comboLivro = new JComboBox<>(
                 livros.stream()
-                        .map(l -> l.getIdLivro() + " - " + l.getTitulo())
+                        .map(l -> l.getIdLivro() + " - " + l.getTitulo() + " (" + l.getStatus() + ")")
                         .toArray(String[]::new)
         );
 
