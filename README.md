@@ -9,14 +9,6 @@ Aplicação desktop em **Java (Swing)** para gerenciar o acervo, os empréstimos
 | **Persistência** | Arquivos `.csv` (UTF-8) na pasta `dados/`, sem banco de dados |
 | **Relacionamento** | Composição: `Emprestimo` e `Reserva` guardam o `Livro` e o `Usuario` completos, não só os IDs |
 
-## 🖼️ Telas
-
-| Menu da Bibliotecária | Menu do Usuário |
-|:---:|:---:|
-| ![Menu da Bibliotecária](docs/menu-bibliotecaria.png) | ![Menu do Usuário](docs/menu-usuario.png) |
-
-Cada botão do menu da bibliotecária abre uma lista de opções (ex.: *Livros → Cadastrar / Editar / Excluir*).
-
 ## ▶️ Como executar
 
 **Requisito:** JDK 17 ou superior (o código usa `switch` com `->`, disponível a partir do Java 14).
