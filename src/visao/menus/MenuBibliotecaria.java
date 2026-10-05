@@ -1,5 +1,8 @@
 package visao.menus;
 
+import controle.BibliotecariaControle;
+import modelo.Bibliotecaria;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -34,73 +37,60 @@ public class MenuBibliotecaria extends JFrame {
     public MenuBibliotecaria(int idBibliotecaria) {
         this.idBibliotecaria = idBibliotecaria;
 
-        setTitle("Menu Bibliotecária - " + this.idBibliotecaria);
-        setSize(800, 600); // Janela mais larga, ideal para barras de menu
+        Bibliotecaria bibliotecaria = BibliotecariaControle.obterBibliotecaria(idBibliotecaria);
+        String nome = (bibliotecaria != null) ? bibliotecaria.getNome() : "Bibliotecária";
+
+        setTitle("Menu Bibliotecária - " + nome);
+        setSize(800, 600);
+        setMinimumSize(new Dimension(700, 520));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // 1. Criar a Barra de Menu principal
-        JMenuBar menuBar = new JMenuBar();
-
-        // 2. Criar os Menus principais
-        JMenu menuCadastros = new JMenu("Cadastros & Edições");
-        JMenu menuOperacoes = new JMenu("Operações");
-        JMenu menuRelatorios = new JMenu("Relatórios");
-        JMenu menuSistema = new JMenu("Sistema");
-
-        // --- MENU CADASTROS & EDIÇÕES ---
-        JMenu subMenuLivros = new JMenu("Livros");
+        // 1. Itens de cada grupo (os mesmos de antes, agora em listas que abrem ao clicar no botão)
+        JPopupMenu menuLivros = new JPopupMenu();
         JMenuItem itemCadastrarLivro = new JMenuItem("Cadastrar Livro");
         JMenuItem itemEditarLivro = new JMenuItem("Editar Livro");
         JMenuItem itemExcluirLivro = new JMenuItem("Excluir Livro");
-        subMenuLivros.add(itemCadastrarLivro);
-        subMenuLivros.add(itemEditarLivro);
-        subMenuLivros.add(itemExcluirLivro);
+        menuLivros.add(itemCadastrarLivro);
+        menuLivros.add(itemEditarLivro);
+        menuLivros.add(itemExcluirLivro);
 
-        JMenu subMenuUsuarios = new JMenu("Usuários");
+        JPopupMenu menuUsuarios = new JPopupMenu();
         JMenuItem itemCadastrarUsuario = new JMenuItem("Cadastrar Usuário");
         JMenuItem itemEditarUsuario = new JMenuItem("Editar Usuário");
         JMenuItem itemExcluirUsuario = new JMenuItem("Excluir Usuário");
-        subMenuUsuarios.add(itemCadastrarUsuario);
-        subMenuUsuarios.add(itemEditarUsuario);
-        subMenuUsuarios.add(itemExcluirUsuario);
+        menuUsuarios.add(itemCadastrarUsuario);
+        menuUsuarios.add(itemEditarUsuario);
+        menuUsuarios.add(itemExcluirUsuario);
 
-        JMenu subMenuBibliotecarias = new JMenu("Bibliotecárias");
+        JPopupMenu menuBibliotecarias = new JPopupMenu();
         JMenuItem itemCadastrarBiblio = new JMenuItem("Cadastrar Bibliotecária");
         JMenuItem itemEditarBiblio = new JMenuItem("Editar Bibliotecária");
         JMenuItem itemExcluirBiblio = new JMenuItem("Excluir Bibliotecária");
-        subMenuBibliotecarias.add(itemCadastrarBiblio);
-        subMenuBibliotecarias.add(itemEditarBiblio);
-        subMenuBibliotecarias.add(itemExcluirBiblio);
+        menuBibliotecarias.add(itemCadastrarBiblio);
+        menuBibliotecarias.add(itemEditarBiblio);
+        menuBibliotecarias.add(itemExcluirBiblio);
 
-        menuCadastros.add(subMenuLivros);
-        menuCadastros.add(subMenuUsuarios);
-        menuCadastros.add(subMenuBibliotecarias);
-
-        // --- MENU OPERAÇÕES ---
-        JMenu subMenuEmprestimos = new JMenu("Empréstimos");
+        JPopupMenu menuEmprestimos = new JPopupMenu();
         JMenuItem itemRegEmprestimo = new JMenuItem("Registrar Empréstimo");
         JMenuItem itemRegDevolucao = new JMenuItem("Registrar Devolução");
         JMenuItem itemEditarEmprestimo = new JMenuItem("Editar Empréstimo");
         JMenuItem itemExcluirEmprestimo = new JMenuItem("Excluir Empréstimo");
-        subMenuEmprestimos.add(itemRegEmprestimo);
-        subMenuEmprestimos.add(itemRegDevolucao);
-        subMenuEmprestimos.addSeparator(); // Adiciona uma linha divisória
-        subMenuEmprestimos.add(itemEditarEmprestimo);
-        subMenuEmprestimos.add(itemExcluirEmprestimo);
+        menuEmprestimos.add(itemRegEmprestimo);
+        menuEmprestimos.add(itemRegDevolucao);
+        menuEmprestimos.addSeparator(); // Adiciona uma linha divisória
+        menuEmprestimos.add(itemEditarEmprestimo);
+        menuEmprestimos.add(itemExcluirEmprestimo);
 
-        JMenu subMenuReservas = new JMenu("Reservas");
+        JPopupMenu menuReservas = new JPopupMenu();
         JMenuItem itemCadastrarReserva = new JMenuItem("Cadastrar Reserva");
         JMenuItem itemEditarReserva = new JMenuItem("Editar Reserva");
         JMenuItem itemExcluirReserva = new JMenuItem("Excluir Reserva");
-        subMenuReservas.add(itemCadastrarReserva);
-        subMenuReservas.add(itemEditarReserva);
-        subMenuReservas.add(itemExcluirReserva);
+        menuReservas.add(itemCadastrarReserva);
+        menuReservas.add(itemEditarReserva);
+        menuReservas.add(itemExcluirReserva);
 
-        menuOperacoes.add(subMenuEmprestimos);
-        menuOperacoes.add(subMenuReservas);
-
-        // --- MENU RELATÓRIOS ---
+        JPopupMenu menuRelatorios = new JPopupMenu();
         JMenuItem itemListarLivros = new JMenuItem("Listar Livros");
         JMenuItem itemLivrosDisponiveis = new JMenuItem("Livros Disponíveis");
         JMenuItem itemLivrosAtraso = new JMenuItem("Livros em Atraso");
@@ -109,7 +99,6 @@ public class MenuBibliotecaria extends JFrame {
         JMenuItem itemListarEmprestimos = new JMenuItem("Listar Empréstimos");
         JMenuItem itemListarReservas = new JMenuItem("Listar Reservas");
         JMenuItem itemResPendentes = new JMenuItem("Reservas Pendentes");
-
         menuRelatorios.add(itemListarLivros);
         menuRelatorios.add(itemLivrosDisponiveis);
         menuRelatorios.add(itemLivrosAtraso);
@@ -121,45 +110,29 @@ public class MenuBibliotecaria extends JFrame {
         menuRelatorios.add(itemListarReservas);
         menuRelatorios.add(itemResPendentes);
 
-        // --- MENU SISTEMA ---
-        JMenuItem itemSair = new JMenuItem("Sair (Voltar ao Menu Inicial)");
-        menuSistema.add(itemSair);
+        // 2. Botões grandes no centro da tela (no lugar da antiga barra de menu no topo)
+        BotaoMenu btnLivros = botaoComLista("Livros", menuLivros);
+        BotaoMenu btnUsuarios = botaoComLista("Usuários", menuUsuarios);
+        BotaoMenu btnBibliotecarias = botaoComLista("Bibliotecárias", menuBibliotecarias);
+        BotaoMenu btnEmprestimos = botaoComLista("Empréstimos", menuEmprestimos);
+        BotaoMenu btnReservas = botaoComLista("Reservas", menuReservas);
+        BotaoMenu btnRelatorios = botaoComLista("Relatórios", menuRelatorios);
+        BotaoMenu btnSair = new BotaoMenu("Sair (Voltar ao Menu Inicial)", BotaoMenu.VERMELHO, false);
 
-        // 3. Adicionar Menus na Barra Principal
-        menuBar.add(menuCadastros);
-        menuBar.add(menuOperacoes);
-        menuBar.add(menuRelatorios);
-        menuBar.add(menuSistema);
+        PainelCartao cartao = new PainelCartao("Painel da Bibliotecária", "Olá, " + nome + "!");
+        cartao.adicionarSecao("Cadastros & Edições");
+        cartao.adicionarLinhaDeBotoes(btnLivros, btnUsuarios, btnBibliotecarias);
+        cartao.adicionarSecao("Operações & Relatórios");
+        cartao.adicionarLinhaDeBotoes(btnEmprestimos, btnReservas, btnRelatorios);
+        cartao.adicionar(btnSair, 26);
 
-        // Configurar a barra de menu na janela
-        setJMenuBar(menuBar);
-
-        // 4. Adicionar o painel central com imagem preenchendo 100%
-        ImageIcon icone = new ImageIcon("images/biblioteca.jpg");
-
-        if (icone.getIconWidth() == -1) {
-            // Se a imagem não for encontrada, mostra o erro
-            JPanel painelErro = new JPanel(new BorderLayout());
-            painelErro.add(new JLabel("Imagem images/biblioteca.jpg não encontrada", SwingConstants.CENTER));
-            add(painelErro);
-        } else {
-            // Cria um painel personalizado que redesenha a imagem ocupando todo o espaço
-            final Image imagemFundo = icone.getImage();
-
-            JPanel painelCentral = new JPanel(new BorderLayout()) {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    // Desenha a imagem a partir da posição 0,0 até ao limite exato do painel
-                    g.drawImage(imagemFundo, 0, 0, getWidth(), getHeight(), this);
-                }
-            };
-
-            add(painelCentral);
-        }
+        // 3. Imagem de fundo ocupando a janela inteira, com o cartão centralizado
+        PainelFundo fundo = new PainelFundo();
+        fundo.add(cartao);
+        setContentPane(fundo);
 
         // ==========================================
-        // 5. Configurar as Ações (ActionListeners)
+        // 4. Configurar as Ações (ActionListeners)
         // ==========================================
 
         // Ações de Livros
@@ -271,11 +244,22 @@ public class MenuBibliotecaria extends JFrame {
         });
 
         // Ação de Sair
-        itemSair.addActionListener(e -> {
+        btnSair.addActionListener(e -> {
             dispose();
             new MenuInicial();
         });
 
         setVisible(true);
+    }
+
+    /** Cria um botão que, ao ser clicado, abre a lista de opções logo abaixo dele. */
+    private BotaoMenu botaoComLista(String texto, JPopupMenu lista) {
+        BotaoMenu botao = new BotaoMenu(texto, BotaoMenu.MADEIRA, true);
+        botao.addActionListener(e -> {
+            Dimension pref = lista.getPreferredSize();
+            lista.setPopupSize(Math.max(pref.width, botao.getWidth()), pref.height);
+            lista.show(botao, 0, botao.getHeight());
+        });
+        return botao;
     }
 }

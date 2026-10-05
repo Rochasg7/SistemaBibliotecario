@@ -1,80 +1,117 @@
-# Sistema de Biblioteca
+# 📚 Sistema de Biblioteca
 
-Projeto acadêmico da disciplina de Programação Orientada a Objetos (UNIVAS),
-desenvolvido a partir da UML da pasta `UML/`.
+Aplicação desktop em **Java (Swing)** para gerenciar o acervo, os empréstimos e as reservas de uma biblioteca. Projeto da disciplina de **Programação Orientada a Objetos (UNIVAS)**, desenvolvido a partir do diagrama de classes (UML) fornecido pelo professor.
 
-Aplicação desktop em Java (Swing) organizada no padrão **MVC**, com
-persistência simples em arquivos `.csv` (UTF-8) e relacionamento entre classes
-por **composição** (ex.: um `Emprestimo` guarda o objeto `Livro` e o objeto
-`Usuario` completos, não apenas seus IDs).
+| | |
+|---|---|
+| **Arquitetura** | MVC (`modelo` · `visao` · `controle`) |
+| **Interface** | Java Swing, com dois perfis: Bibliotecária e Usuário |
+| **Persistência** | Arquivos `.csv` (UTF-8) na pasta `dados/`, sem banco de dados |
+| **Relacionamento** | Composição: `Emprestimo` e `Reserva` guardam o `Livro` e o `Usuario` completos, não só os IDs |
 
-## Estrutura
+## 🖼️ Telas
 
+| Menu da Bibliotecária | Menu do Usuário |
+|:---:|:---:|
+| ![Menu da Bibliotecária](docs/menu-bibliotecaria.png) | ![Menu do Usuário](docs/menu-usuario.png) |
+
+Cada botão do menu da bibliotecária abre uma lista de opções (ex.: *Livros → Cadastrar / Editar / Excluir*).
+
+## ▶️ Como executar
+
+**Requisito:** JDK 17 ou superior (o código usa `switch` com `->`, disponível a partir do Java 14).
+
+> ⚠️ Execute sempre a partir da **raiz do projeto**, a pasta onde estão `dados/` e `images/`. Os caminhos dos arquivos são relativos a ela.
+
+**Pela IDE (IntelliJ, Eclipse, NetBeans, VS Code):** abra a pasta do projeto, marque `src/` como pasta de código-fonte e execute a classe `Main`.
+
+**Pelo terminal:**
+
+```bash
+# Linux / macOS
+javac -encoding UTF-8 -d bin $(find src -name "*.java")
+java -cp bin Main
 ```
-Biblioteca/
-├── UML/                          // diagrama de classes do professor
-├── dados/                        // persistência em .csv
-├── images/biblioteca.jpg         // imagem de fundo dos menus
-└── src/
-    ├── Main.java
-    ├── modelo/     Livro, Usuario, Bibliotecaria, Emprestimo, Reserva,
-    │               StatusLivro, StatusReserva
-    ├── controle/   LivroControle, UsuarioControle, BibliotecariaControle,
-    │               EmprestimoControle, ReservaControle
-    ├── visao/
-    │   ├── menus/  MenuInicial, MenuBibliotecaria, MenuUsuario
-    │   └── telas/  telas de cadastro, edição, exclusão e listagem
-    └── util/       ManipuladorArquivos (leitura/escrita dos .csv)
+
+```bat
+:: Windows (cmd)
+dir /s /b src\*.java > fontes.txt
+javac -encoding UTF-8 -d bin @fontes.txt
+java -cp bin Main
 ```
 
-## Como executar
+Na primeira execução, se `dados/Bibliotecaria.csv` estiver vazio, o sistema cria a bibliotecária padrão **`admin`**.
 
-1. Abra a pasta do projeto no IntelliJ/Eclipse/NetBeans/VS Code
-   (a pasta de trabalho deve ser a raiz do projeto, onde estão `dados/` e `images/`).
-2. Compile e execute a classe `Main` (pacote raiz).
-3. Na primeira execução, `Main` cria a bibliotecária padrão (`admin`) caso
-   `dados/Bibliotecaria.csv` esteja vazio.
-4. Na tela inicial escolha o perfil **Bibliotecária** ou **Usuário**.
+## 🔑 Como entrar
 
-## Funcionalidades (requisitos do professor)
+Não há senha. Na tela inicial escolha o perfil (**Bibliotecária** ou **Usuário**) e selecione quem está acessando na lista.
 
-**CRUD completo** (cadastrar, editar, excluir, listar) para Usuário, Livro,
-Bibliotecária, Empréstimo e Reserva, pelo menu da bibliotecária:
+| Perfil | O que pode fazer |
+|---|---|
+| **Bibliotecária** | CRUD completo de Livros, Usuários, Bibliotecárias, Empréstimos e Reservas; devoluções; relatórios |
+| **Usuário** | Solicitar empréstimo, reservar livro, ver suas reservas e seu histórico de leitura |
 
-| Entidade | Cadastrar | Editar | Excluir | Listar |
-|---|---|---|---|---|
-| Usuário / Livro / Bibliotecária | Cadastros & Edições | Cadastros & Edições | Cadastros & Edições | Relatórios |
-| Empréstimo | Operações > Registrar Empréstimo (bibliotecária) ou Solicitar Empréstimo (usuário) | Operações (data) | Operações | Relatórios |
-| Reserva | Operações > Cadastrar Reserva (bibliotecária) ou Reservar Livro (usuário) | Operações (data) | Operações | Relatórios |
+## ✅ Funcionalidades
 
-**Relatórios:** Livros Disponíveis, Livros em Atraso (com dias de atraso) e
-Reservas Pendentes de efetivação.
+**CRUD (cadastrar, editar, excluir, listar)** para as cinco entidades:
 
-## Regras de negócio
+| Entidade | Onde fica no menu da bibliotecária |
+|---|---|
+| Livro · Usuário · Bibliotecária | Cadastros & Edições (cadastrar, editar, excluir) · Relatórios (listar) |
+| Empréstimo | Empréstimos (registrar, devolver, editar a data, excluir) · Relatórios (listar) |
+| Reserva | Reservas (cadastrar, editar a data, excluir) · Relatórios (listar) |
+
+**Relatórios:** Livros Disponíveis · Livros em Atraso (com dias de atraso) · Reservas Pendentes de efetivação.
+
+## 📏 Regras de negócio
 
 - **Prazo de empréstimo:** 7 dias.
-- **Reserva por data:** a reserva é feita para uma data (hoje ou futura).
-  - Bloqueia livro **emprestado** no momento.
-  - Bloqueia livro **já reservado na data**: cada reserva ocupa o prazo de 7 dias,
-    então outra reserva do mesmo livro a menos de 7 dias de distância é recusada.
-- **Empréstimo:** bloqueia livro já emprestado e livro **reservado por outro
-  usuário** dentro do prazo do empréstimo (a reserva cai antes de 7 dias).
-  Vale para a bibliotecária e para a solicitação do usuário.
-- **Baixa automática da reserva:** ao efetuar o empréstimo para o usuário que
-  reservou, a reserva passa a `CONCLUIDA`.
-- **Devolução:** o sistema informa se está **dentro do prazo** ou **atrasada** e a
-  **quantidade de dias em atraso**, com a multa (R$ 2,00/dia de atraso).
-- **Status do livro** sempre coerente: `EMPRESTADO` (empréstimo ativo) >
-  `RESERVADO` (reserva ativa) > `DISPONIVEL`. É recalculado a cada empréstimo,
-  devolução, reserva ou exclusão.
-- **Exclusão segura:** livro ou usuário com empréstimo ativo **ou reserva ativa**
-  não podem ser excluídos. Ao excluir, o histórico deles (empréstimos devolvidos e
-  reservas encerradas) também é removido, sem deixar registros órfãos.
-- O usuário consulta o **Histórico de Leitura** (empréstimos já devolvidos) no menu.
+- **Multa:** R$ 2,00 por dia de atraso. A devolução informa se foi **no prazo** ou **atrasada** e quantos dias.
+- **Reserva por data:** feita para hoje ou data futura. Cada reserva ocupa 7 dias, então outra reserva do mesmo livro a menos de 7 dias de distância é recusada. Livro **emprestado** no momento também não pode ser reservado.
+- **Empréstimo bloqueado** se o livro já está emprestado ou se está **reservado por outro usuário** dentro do prazo do empréstimo. Vale para a bibliotecária e para a solicitação do usuário.
+- **Baixa automática da reserva:** ao emprestar para quem reservou, a reserva passa a `CONCLUIDA`.
+- **Status do livro sempre coerente:** `EMPRESTADO` > `RESERVADO` > `DISPONIVEL`, recalculado a cada empréstimo, devolução, reserva ou exclusão.
+- **Exclusão segura:** livro ou usuário com empréstimo ativo ou reserva ativa não podem ser excluídos. Ao excluir, o histórico deles também é removido, sem registros órfãos.
 
-## Persistência
+## 🗂️ Estrutura do projeto
 
-Todos os dados são salvos em `.csv` dentro de `dados/`. No CSV ficam gravados os
-IDs; `ManipuladorArquivos` reconstrói os objetos completos ao ler (buscando cada
-`Livro`/`Usuario` pelo ID). Registros que apontam para livro/usuário inexistente
-são ignorados, e um empréstimo nunca aparece duplicado (vale o último registro do ID).
+```
+SistemaBibliotecario/
+├── UML/                 diagrama de classes do professor
+├── docs/                prints das telas (usados neste README)
+├── dados/               persistência em .csv
+├── images/              biblioteca.jpg (fundo dos menus)
+└── src/
+    ├── Main.java
+    ├── modelo/          Livro, Usuario, Bibliotecaria, Emprestimo, Reserva,
+    │                    StatusLivro, StatusReserva
+    ├── controle/        regras de negócio: LivroControle, UsuarioControle,
+    │                    BibliotecariaControle, EmprestimoControle, ReservaControle
+    ├── visao/
+    │   ├── menus/       MenuInicial, MenuBibliotecaria, MenuUsuario
+    │   │                + PainelFundo, PainelCartao, BotaoMenu (visual dos menus)
+    │   └── telas/       cadastro, edição, exclusão e listagem
+    └── util/            ManipuladorArquivos (leitura e escrita dos .csv)
+```
+
+**Fluxo MVC:** a *tela* (`visao`) captura o que o usuário digitou e chama o *controle*, que valida as regras e usa o `ManipuladorArquivos` para ler e gravar. O *modelo* guarda só os dados e o comportamento básico das entidades.
+
+## 💾 Persistência
+
+Cada entidade tem um arquivo em `dados/`, com campos separados por `;`.
+
+| Arquivo | Campos |
+|---|---|
+| `Livro.csv` | id ; título ; autor ; status |
+| `Usuario.csv` | id ; nome ; e-mail |
+| `Bibliotecaria.csv` | id ; nome |
+| `Emprestimo.csv` | id ; idLivro ; idUsuario ; data do empréstimo ; data da devolução ; ativo |
+| `Reserva.csv` | id ; idLivro ; idUsuario ; data da reserva ; status |
+
+No CSV ficam só os IDs; o `ManipuladorArquivos` reconstrói os objetos completos ao ler. Registros que apontam para livro ou usuário inexistente são ignorados.
+
+## ⚠️ Limitações conhecidas
+
+- Não há autenticação por senha; o acesso é por seleção de perfil.
+- Os dados em CSV não suportam acesso simultâneo de várias instâncias do programa.
+- Fechar qualquer janela pelo "X" encerra o programa inteiro.

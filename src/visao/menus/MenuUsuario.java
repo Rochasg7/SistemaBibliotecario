@@ -3,7 +3,6 @@ package visao.menus;
 import controle.UsuarioControle;
 import modelo.Emprestimo;
 import modelo.Usuario;
-import util.ManipuladorArquivos;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,89 +19,54 @@ public class MenuUsuario extends JFrame {
         this.idUsuario = idUsuario;
 
         // 1. Buscar o nome do usuário pelo ID
-        String nomeUsuario = "Desconhecido";
-        for (Usuario u : ManipuladorArquivos.lerUsuarios()) {
-            if (u.getIdUsuario() == this.idUsuario) {
-                nomeUsuario = u.getNome();
-                break;
-            }
-        }
+        Usuario usuario = UsuarioControle.obterUsuario(idUsuario);
+        String nomeUsuario = (usuario != null) ? usuario.getNome() : "Desconhecido";
 
-        // 2. Definir o título com o nome
         setTitle("Menu Usuário - " + nomeUsuario);
         setSize(800, 600);
+        setMinimumSize(new Dimension(700, 520));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // 3. Criar a Barra de Menu principal
-        JMenuBar menuBar = new JMenuBar();
+        // 2. Botões (no lugar da antiga barra de menu no topo)
+        BotaoMenu btnSolicitarEmprestimo = new BotaoMenu("Solicitar Empréstimo");
+        BotaoMenu btnReservarLivro = new BotaoMenu("Reservar Livro");
+        BotaoMenu btnMinhasReservas = new BotaoMenu("Minhas Reservas");
+        BotaoMenu btnHistorico = new BotaoMenu("Histórico de Leitura");
+        BotaoMenu btnSair = new BotaoMenu("Sair (Voltar ao Menu Inicial)", BotaoMenu.VERMELHO, false);
 
-        // 4. Criar os Menus principais
-        JMenu menuAcoes = new JMenu("Livros & Ações");
-        JMenu menuMinhaConta = new JMenu("Minha Conta");
-        JMenu menuSistema = new JMenu("Sistema");
+        // 3. Cartão central com os botões agrupados, sobre a imagem de fundo
+        PainelCartao cartao = new PainelCartao("Olá, " + nomeUsuario + "!", "O que você deseja fazer?");
+        cartao.adicionarSecao("Livros & Ações");
+        cartao.adicionarLinhaDeBotoes(btnSolicitarEmprestimo, btnReservarLivro);
+        cartao.adicionarSecao("Minha Conta");
+        cartao.adicionarLinhaDeBotoes(btnMinhasReservas, btnHistorico);
+        cartao.adicionar(btnSair, 26);
 
-        // --- MENU LIVROS & AÇÕES ---
-        JMenuItem itemSolicitarEmprestimo = new JMenuItem("Solicitar Empréstimo");
-        JMenuItem itemReservarLivro = new JMenuItem("Reservar Livro");
-        menuAcoes.add(itemSolicitarEmprestimo);
-        menuAcoes.add(itemReservarLivro);
-
-        // --- MENU MINHA CONTA ---
-        JMenuItem itemMinhasReservas = new JMenuItem("Minhas Reservas");
-        JMenuItem itemHistorico = new JMenuItem("Histórico de Leitura");
-        menuMinhaConta.add(itemMinhasReservas);
-        menuMinhaConta.add(itemHistorico);
-
-        // --- MENU SISTEMA ---
-        JMenuItem itemSair = new JMenuItem("Sair (Voltar ao Menu Inicial)");
-        menuSistema.add(itemSair);
-
-        // 5. Adicionar Menus na Barra Principal
-        menuBar.add(menuAcoes);
-        menuBar.add(menuMinhaConta);
-        menuBar.add(menuSistema);
-
-        // Configurar a barra de menu na janela
-        setJMenuBar(menuBar);
-
-        // 6. Adicionar o painel central com a imagem "biblioteca.jpg"
-        JPanel painelCentral = new JPanel(new BorderLayout());
-        painelCentral.setBackground(Color.WHITE); // Fundo branco opcional
-
-        ImageIcon iconeOriginal = new ImageIcon("images/biblioteca.jpg");
-
-        if (iconeOriginal.getIconWidth() == -1) {
-            JLabel labelErro = new JLabel("Imagem images/biblioteca.jpg não encontrada", SwingConstants.CENTER);
-            painelCentral.add(labelErro, BorderLayout.CENTER);
-        } else {
-            Image imagemRedimensionada = iconeOriginal.getImage().getScaledInstance(400, 300, Image.SCALE_SMOOTH);
-            JLabel labelImagem = new JLabel(new ImageIcon(imagemRedimensionada), SwingConstants.CENTER);
-            painelCentral.add(labelImagem, BorderLayout.CENTER);
-        }
-
-        add(painelCentral);
+        PainelFundo fundo = new PainelFundo();
+        fundo.add(cartao);
+        setContentPane(fundo);
 
         // ==========================================
-        // 7. Configurar as Ações (ActionListeners)
+        // 4. Configurar as Ações (ActionListeners)
         // ==========================================
 
-        itemSolicitarEmprestimo.addActionListener(e -> {
+        btnSolicitarEmprestimo.addActionListener(e -> {
             dispose();
             new TelaSolicitarEmprestimo(idUsuario);
         });
 
-        itemReservarLivro.addActionListener(e -> {
+        btnReservarLivro.addActionListener(e -> {
             dispose();
             new TelaReservarLivro(idUsuario);
         });
 
-        itemMinhasReservas.addActionListener(e -> {
+        btnMinhasReservas.addActionListener(e -> {
             dispose();
             new TelaMinhasReservas(idUsuario);
         });
 
-        itemHistorico.addActionListener(e -> {
+        btnHistorico.addActionListener(e -> {
             Usuario usuarioLogado = UsuarioControle.obterUsuario(idUsuario);
             if (usuarioLogado != null) {
                 usuarioLogado.consultarEmprestimos();
@@ -131,7 +95,7 @@ public class MenuUsuario extends JFrame {
             }
         });
 
-        itemSair.addActionListener(e -> {
+        btnSair.addActionListener(e -> {
             dispose();
             new MenuInicial();
         });
